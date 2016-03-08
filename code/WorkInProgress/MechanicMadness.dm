@@ -2171,6 +2171,7 @@ var/list/mechanics_telepads = new/list()
 	New()
 		..()
 		mechanics.addInput("input", "fire")
+		verbs -= /obj/item/mechanics/verb/setvalue
 		return
 
 	proc/fire(var/datum/mechanicsMessage/input)
