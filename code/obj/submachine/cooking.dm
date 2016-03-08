@@ -544,6 +544,9 @@ var/list/oven_recipes = list()
 			if(istype(W, check_path))
 				proceed = 1
 				break
+		if(istype(W, /obj/item/grab))
+			proceed = 0
+
 		if (amount == 1)
 			var/cakecount
 			for (var/obj/item/reagent_containers/food/snacks/cake/cream/C in src.contents) cakecount++
@@ -551,7 +554,7 @@ var/list/oven_recipes = list()
 		if (!proceed)
 			boutput(user, "<span style=\"color:red\">You can't put that in the oven!</span>")
 			return
-		user.visible_message("<span style=\"color:blue\">[user] loads [W] into the [src].</span>")
+		user.visible_message("<span style=\"color:blue\">[user] loads [W] into [src].</span>")
 		user.u_equip(W)
 		W.set_loc(src)
 		W.dropped()
