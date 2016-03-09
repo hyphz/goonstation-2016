@@ -422,6 +422,22 @@ var/list/oven_recipes = list()
 
 			// If emagged produce random output.
 			if (emagged)
+
+				// Enforce GIGO and prevent infinite reuse
+				var/contentsok = 1
+				for(var/obj/item/I in src.contents)
+					if(istype(I, /obj/item/reagent_containers/food/snacks/yuck))
+						contentsok = 0
+						break
+					if(istype(I, /obj/item/reagent_containers/food/snacks/yuckburn))
+						contentsok = 0
+						break
+					if(istype(I, /obj/item/reagent_containers/food/snacks))
+						var/obj/item/reagent_containers/food/snacks/F = I
+						if (F.heal_amt==0) // As it will be on anything produced from an emag oven
+							contentsok = 0
+							break
+
 			    // Pick a random recipe
 				var/datum/cookingrecipe/xrecipe = pick(src.recipes)
 				var/xrecipeok = 1
@@ -432,7 +448,7 @@ var/list/oven_recipes = list()
 				if (isnull(xrecipe.output))
 					xrecipeok = 0
 				// Bail out to a mess if we didn't get a valid recipe
-				if (xrecipeok)
+				if (xrecipeok && contentsok)
 					output = xrecipe.output
 				else
 					output = /obj/item/reagent_containers/food/snacks/yuck
