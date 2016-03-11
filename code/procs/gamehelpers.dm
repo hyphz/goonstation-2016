@@ -95,15 +95,11 @@ var/list/stinkThingies = list("ass","taint","armpit","excretions","leftovers")
 
 	return null
 
-/proc/get_area(O)
-	var/location = O
-	var/i
-	for(i=1, i<=20, i++)
-		if(location && !isarea(location))
-			location = location:loc
-		else
-			return location
-	return 0
+/proc/get_area(atom/A)
+	if (!istype(A))
+		return
+	for(A, A && !isarea(A), A=A.loc);
+	return A
 
 /proc/get_area_name(N) //get area by it's name
 

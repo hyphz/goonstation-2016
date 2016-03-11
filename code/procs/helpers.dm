@@ -1172,13 +1172,11 @@ var/list/hasvar_type_cache = list()
 		else
 	return
 
-/proc/get_turf(turf/location as turf)
-	while (location)
-		if (istype(location, /turf))
-			return location
-
-		location = location.loc
-	return null
+/proc/get_turf(atom/A)
+	if (!istype(A))
+		return
+	for(A, A && !isturf(A), A=A.loc);
+	return A
 
 /proc/dir2text(direction)
 	switch(direction)

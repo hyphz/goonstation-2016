@@ -93,7 +93,53 @@
 	anchored = 1
 	density = 0
 	layer = EFFECTS_LAYER_UNDER_1
-	var/destroyed = 0
+	var/destroyed = 0 // Broken shrubs are unable to vend prizes, this is also used to track a objective.
+	var/max_uses = 0 // The maximum amount of time one can try to shake this shrub for something.
+	var/spawn_chance = 0 // How likely is this shrub to spawn something?
+	var/last_use = 0 // To prevent spam.
+	var/time_between_uses = 400 // The default time between uses.
+	var/override_default_behvaiour = 0 // When this is set to 1, the additional_items list will be used to dispense items.
+	var/list/additional_items = new // See above.
+
+	New()
+		max_uses = rand(0, 5)
+		spawn_chance = rand(1, 40)
+	
+	attack_hand(mob/user as mob)
+		if (!user) return
+		if (destroyed) return
+
+		playsound(src, "sound/weapons/thudswoosh.ogg", 50, 1, -1) // todo: find a better sound.
+		
+		var/original_x = pixel_x
+		var/original_y = pixel_y
+		var/wiggle = 6
+
+		while(wiggle > 0)
+			wiggle--
+			animate(src, pixel_x = rand(-3,3), pixel_y = rand(-3,3), time = 2,easing = EASE_IN)			
+			sleep(1)
+
+		animate(src, pixel_x = original_x, pixel_y = original_y, time = 2,easing = EASE_OUT)
+
+		if (max_uses > 0 && ((last_use + time_between_uses) < world.time) && prob(spawn_chance))
+			var/something = null
+
+			if(override_default_behvaiour)
+				something = pick(additional_items)
+			else
+				something = pick(trinket_safelist)
+			
+			if (ispath(something))
+				var/thing = new something(src.loc)
+				visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around! \the [thing] falls out!</span></b>", 1)
+				last_use = world.time
+				max_uses--
+		else
+			visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around![prob(20) ? " A few leaves fall out!" : null]</span></b>", 1)
+			
+
+
 
 /obj/shrub/captainshrub
 	name = "\improper Captain's bonsai tree"

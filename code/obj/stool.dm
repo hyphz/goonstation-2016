@@ -788,17 +788,45 @@
 	icon_state = "chair_couch-brown"
 	rotatable = 0
 	foldable = 0
-	var/damaged = 0
 	comfort_value = 5
-	deconstructable = 0
-
+	deconstructable = 0	
+	var/damaged = 0
+	var/max_uses = 0 // The maximum amount of time one can try to look under the cushions for items.
+	var/spawn_chance = 0 // How likely is this couch to spawn something?
+	var/last_use = 0 // To prevent spam.
+	var/time_between_uses = 400 // The default time between uses.
+	var/list/items = list (/obj/item/zippo, /obj/item/wrench, /obj/item/spacecash/random, /obj/item/spacecash/random/tourist, /obj/item/spacecash/buttcoin)
+	
 	New()
 		..()
+		max_uses = rand(0, 2) // Losing things in a couch is hard.
+		spawn_chance = rand(1, 20)
 		couches.Add(src)
 
 	Del()
 		couches.Remove(src)
 		..()
+
+	attack_hand(mob/user as mob)
+		if (!user) return
+		if (damaged) return 
+		
+		playsound(src.loc, "rustle", 50, 1, -5) // todo: find a better sound.
+
+		if (max_uses > 0 && ((last_use + time_between_uses) < world.time) && prob(spawn_chance))
+			
+			var/something = pick(items)
+
+			if (ispath(something))
+				var/thing = new something(src.loc)
+				user.put_in_hand_or_drop(thing)
+				user.visible_message("<span style=\"color:blue\"><b>[user.name]</b> rummages through the seams and behind the cushions of [src] and pulls \the [thing] out of it!</span>", "<span style=\"color:blue\">You rummage through the seams and behind the cushions of [src] and you find \the [thing]!</span>")
+				last_use = world.time
+				max_uses--
+
+		else
+			user.visible_message("<span style=\"color:blue\"><b>[user.name]</b> rummages through the seams and behind the cushions of [src]!</span>", "<span style=\"color:blue\">You rummage through the seams and behind the cushions of [src]!</span>")
+
 
 	proc/damage(severity)
 		if(severity > 1 && damaged < 2)
