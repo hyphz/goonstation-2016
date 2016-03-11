@@ -210,12 +210,22 @@ var/list/oven_recipes = list()
 	density = 1
 	mats = 18
 	flags = NOSPLASH
+	var/emagged = 0
 	var/working = 0
 	var/time = 5
 	var/heat = "Low"
 	var/list/recipes = null
 	//var/allowed = list(/obj/item/reagent_containers/food/, /obj/item/parts/robot_parts/head, /obj/item/clothing/head/butt, /obj/item/organ/brain/obj/item)
 	var/allowed = list(/obj/item)
+
+	emag_act(var/mob/user, var/obj/item/card/emag/E)
+		if (!emagged)
+			emagged = 1
+			if(user)
+				boutput(user, "<span style=\"color:blue\">[src] produces a strange grinding noise.</span>")
+			return 1
+		else
+			return 0
 
 	attack_hand(var/mob/user as mob)
 		if (!src.working)
@@ -409,31 +419,68 @@ var/list/oven_recipes = list()
 			var/recipebonus = 0
 			var/recook = 0
 			if (src.heat == "High") cook_amt *= 2
-			for (var/datum/cookingrecipe/R in src.recipes)
-				if (R.item1)
-					if (!OVEN_checkitem(R.item1, R.amt1)) continue
-				if (R.item2)
-					if (!OVEN_checkitem(R.item2, R.amt2)) continue
-				if (R.item3)
-					if (!OVEN_checkitem(R.item3, R.amt3)) continue
-				if (R.item4)
-					if (!OVEN_checkitem(R.item4, R.amt4)) continue
 
-				output = R.specialOutput(src)
-				if (isnull(output))
-					output = R.output
+			// If emagged produce random output.
+			if (emagged)
 
-				score_meals += 1
-				if (R.useshumanmeat) derivename = 1
-				recipebonus = R.cookbonus
-				if (cook_amt == R.cookbonus) bonus = 1
-				else if (cook_amt == R.cookbonus + 1) bonus = 1
-				else if (cook_amt == R.cookbonus - 1) bonus = 1
-				else if (cook_amt <= R.cookbonus - 5) bonus = -1
-				else if (cook_amt >= R.cookbonus + 5)
-					output = /obj/item/reagent_containers/food/snacks/yuckburn
-					bonus = 0
-				break
+				// Enforce GIGO and prevent infinite reuse
+				var/contentsok = 1
+				for(var/obj/item/I in src.contents)
+					if(istype(I, /obj/item/reagent_containers/food/snacks/yuck))
+						contentsok = 0
+						break
+					if(istype(I, /obj/item/reagent_containers/food/snacks/yuckburn))
+						contentsok = 0
+						break
+					if(istype(I, /obj/item/reagent_containers/food/snacks))
+						var/obj/item/reagent_containers/food/snacks/F = I
+						if (F.heal_amt==0) // As it will be on anything produced from an emag oven
+							contentsok = 0
+							break
+
+			    // Pick a random recipe
+				var/datum/cookingrecipe/xrecipe = pick(src.recipes)
+				var/xrecipeok = 1
+				// Don't choose recipes with human meat since we don't have a name for them
+				if (xrecipe.useshumanmeat)
+					xrecipeok = 0
+				// Don't choose recipes with special outputs since we don't have valid inputs for them
+				if (isnull(xrecipe.output))
+					xrecipeok = 0
+				// Bail out to a mess if we didn't get a valid recipe
+				if (xrecipeok && contentsok)
+					output = xrecipe.output
+				else
+					output = /obj/item/reagent_containers/food/snacks/yuck
+				// Given the weird stuff coming out of the oven it presumably wouldn't be palatable..
+				recipebonus = 0
+				bonus = -1
+			else
+				for (var/datum/cookingrecipe/R in src.recipes)
+					if (R.item1)
+						if (!OVEN_checkitem(R.item1, R.amt1)) continue
+					if (R.item2)
+						if (!OVEN_checkitem(R.item2, R.amt2)) continue
+					if (R.item3)
+						if (!OVEN_checkitem(R.item3, R.amt3)) continue
+					if (R.item4)
+						if (!OVEN_checkitem(R.item4, R.amt4)) continue
+
+					output = R.specialOutput(src)
+					if (isnull(output))
+						output = R.output
+
+					score_meals += 1
+					if (R.useshumanmeat) derivename = 1
+					recipebonus = R.cookbonus
+					if (cook_amt == R.cookbonus) bonus = 1
+					else if (cook_amt == R.cookbonus + 1) bonus = 1
+					else if (cook_amt == R.cookbonus - 1) bonus = 1
+					else if (cook_amt <= R.cookbonus - 5) bonus = -1
+					else if (cook_amt >= R.cookbonus + 5)
+						output = /obj/item/reagent_containers/food/snacks/yuckburn
+						bonus = 0
+					break
 
 			if (isnull(output))
 				output = /obj/item/reagent_containers/food/snacks/yuck
@@ -544,6 +591,12 @@ var/list/oven_recipes = list()
 			if(istype(W, check_path))
 				proceed = 1
 				break
+		if(istype(W, /obj/item/grab))
+			proceed = 0
+		// Necessary to allow the oven to be emagged.
+		if(istype(W, /obj/item/card/emag))
+			..()
+			return
 		if (amount == 1)
 			var/cakecount
 			for (var/obj/item/reagent_containers/food/snacks/cake/cream/C in src.contents) cakecount++
@@ -551,7 +604,7 @@ var/list/oven_recipes = list()
 		if (!proceed)
 			boutput(user, "<span style=\"color:red\">You can't put that in the oven!</span>")
 			return
-		user.visible_message("<span style=\"color:blue\">[user] loads [W] into the [src].</span>")
+		user.visible_message("<span style=\"color:blue\">[user] loads [W] into [src].</span>")
 		user.u_equip(W)
 		W.set_loc(src)
 		W.dropped()

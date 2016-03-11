@@ -104,13 +104,13 @@
 	New()
 		max_uses = rand(0, 5)
 		spawn_chance = rand(1, 40)
-	
+
 	attack_hand(mob/user as mob)
 		if (!user) return
 		if (destroyed) return
 
 		playsound(src, "sound/weapons/thudswoosh.ogg", 50, 1, -1) // todo: find a better sound.
-		
+
 		var/original_x = pixel_x
 		var/original_y = pixel_y
 		var/wiggle = 6
@@ -129,7 +129,6 @@
 				something = pick(additional_items)
 			else
 				something = pick(trinket_safelist)
-			
 			if (ispath(something))
 				var/thing = new something(src.loc)
 				visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around! \the [thing] falls out!</span></b>", 1)
@@ -137,7 +136,6 @@
 				max_uses--
 		else
 			visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around![prob(20) ? " A few leaves fall out!" : null]</span></b>", 1)
-			
 
 
 

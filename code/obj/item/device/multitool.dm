@@ -14,7 +14,7 @@
 	module_research = list("tools" = 5, "devices" = 2)
 	//I don't actually know what I'm doing but hopefully this will cause severe deadly burns. Also electrical puns.
 	
-	/obj/item/device/multitool/suicide(var/mob/user as mob)
+/obj/item/device/multitool/suicide(var/mob/user as mob)
 	user.visible_message("<span style=\"color:red\"><b>[user] connects the wires from the multitool onto \his tongue and presses pulse. It's pretty shocking to look at.</b></span>")
 	user.TakeDamage("head", 0,160)
 	user.updatehealth()

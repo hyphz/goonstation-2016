@@ -765,6 +765,7 @@ var/telesci_modifiers_set = 0
 				var/turfs = list()
 				for(var/turf/T in world)
 					if(!contents) continue
+					if(isrestrictedz(T.z)) continue
 					turfs += T
 				var/turf = pick(turfs)
 				for(var/atom/movable/O as obj|mob in turf)

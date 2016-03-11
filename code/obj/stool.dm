@@ -809,12 +809,12 @@
 
 	attack_hand(mob/user as mob)
 		if (!user) return
-		if (damaged) return 
-		
+		if (damaged) return
+
 		playsound(src.loc, "rustle", 50, 1, -5) // todo: find a better sound.
 
 		if (max_uses > 0 && ((last_use + time_between_uses) < world.time) && prob(spawn_chance))
-			
+
 			var/something = pick(items)
 
 			if (ispath(something))

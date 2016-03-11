@@ -410,7 +410,8 @@
 		product_list += new/datum/data/vending_product("/obj/item/mechanics/cashmoney", 30)
 		product_list += new/datum/data/vending_product("/obj/item/mechanics/flushcomp", 30)
 		product_list += new/datum/data/vending_product("/obj/item/mechanics/networkcomp", 30)
-
+		product_list += new/datum/data/vending_product("/obj/item/mechanics/instrumentPlayer", 10)
+		
 /obj/machinery/vending/computer3
 	name = "CompTech"
 	desc = "A computer equipment vendor."
