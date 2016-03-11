@@ -89,7 +89,7 @@
 			qdel(src)
 
 
-		else if (src.reagents.has_reagent("vomit") || src.reagents.has_reagent("blackpowder") || src.reagents.has_reagent("blood") || src.reagents.has_reagent("gvomit") || src.reagents.has_reagent("carbon") || src.reagents.has_reagent("cryostylane") || src.reagents.has_reagent("chickensoup") || src.reagents.has_reagent("salt"))
+		else if (src.reagents.has_reagent("vomit") || src.reagents.has_reagent("blackpowder") || src.reagents.has_reagent("blood") || src.reagents.has_reagent("ketchup") || src.reagents.has_reagent("gvomit") || src.reagents.has_reagent("carbon") || src.reagents.has_reagent("cryostylane") || src.reagents.has_reagent("chickensoup") || src.reagents.has_reagent("salt"))
 			boutput(user, "<span style=\"color:red\">The nozzle is clogged!</span>")
 			return
 
@@ -146,4 +146,5 @@
 		src.desc = "The safety is on."
 		boutput(user, "The safety is on.")
 		safety = 1
+>>>>>>> goon-patches
 	return
