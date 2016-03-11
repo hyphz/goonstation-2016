@@ -129,7 +129,7 @@
 				something = pick(additional_items)
 			else
 				something = pick(trinket_safelist)
-
+			
 			if (ispath(something))
 				var/thing = new something(src.loc)
 				visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around! \the [thing] falls out!</span></b>", 1)
@@ -137,7 +137,7 @@
 				max_uses--
 		else
 			visible_message("<b><span style=\"color:red\">[user] violently shakes [src] around![prob(20) ? " A few leaves fall out!" : null]</span></b>", 1)
-
+			
 
 
 

@@ -557,6 +557,8 @@
 		src.host_program.pda_message(pdasay_autocomplete[target], target, message)
 
 /obj/item/device/pda2
+	proc/is_user_in_range(var/mob/user)
+		return in_range(src, user) || loc == user
 
 	proc/post_signal(datum/signal/signal,var/newfreq)
 		spawn(0)
@@ -648,6 +650,10 @@
 		src.overlays = null
 		src.overlays += image('icons/obj/pda.dmi', "pda-r")
 		return
+
+	proc/display_message(var/message)
+		if (ismob(loc))
+			boutput(loc, message)
 
 	proc/run_program(datum/computer/file/pda_program/program)
 		if((!program) || (!program.holder))
@@ -743,6 +749,21 @@
 		qdel(src)
 		return
 
+/obj/item/device/pda2/ai/display_message(var/message)
+	. = ..(message)
+	// The AI might be deployed to shell, in which case we'll relay the message
+	if (!isAI(loc))
+		return
+	var/mob/living/silicon/ai/ai = loc
+	if (ismob(ai.deployed_shell))
+		boutput(ai.deployed_shell, message)
+
+/obj/item/device/pda2/ai/is_user_in_range(var/mob/user)
+	if (issilicon(user))
+		var/mob/living/silicon/S = user
+		if (S.mainframe && S.mainframe == loc)
+			return 1
+	return ..(user)
 
 /*
  *	PDA 2 ~help file~

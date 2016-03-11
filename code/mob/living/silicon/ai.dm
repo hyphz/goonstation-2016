@@ -54,6 +54,7 @@ var/list/ai_emotions = list("Happy" = "ai_happy",\
 	var/obj/item/organ/brain/brain = null
 	var/moustache_mode = 0
 	var/status_message = null
+	var/mob/living/silicon/deployed_shell = null
 
 	var/faceEmotion = "ai_happy"
 	var/faceColor = "#66B2F2"
@@ -1294,12 +1295,14 @@ var/list/ai_emotions = list("Happy" = "ai_happy",\
 		target_shell.mainframe = src
 		target_shell.dependent = 1
 		target_shell.name = src.name
+		src.deployed_shell = target_shell
 		src.mind.transfer_to(target_shell)
 		return
 
 /mob/living/silicon/ai/proc/return_to(var/mob/user)
 	if (user.mind)
 		user.mind.transfer_to(src)
+		src.deployed_shell = null
 		spawn(20)
 			if (ismob(user)) // bluhh who the fuck knows, this at least checks that user isn't null as well
 				if (isshell(user))

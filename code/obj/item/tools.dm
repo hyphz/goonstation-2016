@@ -29,9 +29,9 @@ MATERIAL COLLECTOR
 
 /obj/item/crowbar/vr
 	icon = 'icons/effects/VR.dmi'
-//I have no idea what I'm doing, so I'll just copy and paste the screw driver code. Maybe the message is too referency though.
+//I have no idea what I'm doing, so I'll just copy and paste the screw driver code. Maybe the message is too referency though. 	
 /obj/item/crowbar/suicide(var/mob/user as mob)
-	user.visible_message("<span style=\"color:red\"><b>[user] beats /his in the head with a crowbar, like some kind of suicidal theoretical physicist.</b></span>")
+	user.visible_message("<span style=\"color:red\"><b>[user] beats [himself_or_herself(user)] in the head with a crowbar, like some kind of suicidal theoretical physicist.</b></span>")
 	take_bleeding_damage(user, null, 25, DAMAGE_STAB)
 	user.TakeDamage("head", 160, 0)
 	user.updatehealth()

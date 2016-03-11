@@ -15,6 +15,10 @@
 		if (!istype(C)|| C.anchored || get_dist(user, src) > 1 || get_dist(src,C) > 1 )
 			return
 
+		if (istype(C, /obj/vehicle/tug))
+			user.show_text("\The [C] is too heavy for the [src]!", "red")
+			return
+
 		if (istype(C, /obj/tug_cart) && in_range(C, src))
 			var/obj/tug_cart/connecting = C
 			if (src == connecting) //Wire: Fix for mass recursion runtime (carts connected to themselves)
@@ -39,20 +43,27 @@
 
 	MouseDrop(obj/over_object as obj, src_location, over_location)
 		..()
+		var/turf/T = get_turf(over_location)
 		var/mob/user = usr
 		if (!user || !(in_range(user, src) || user.loc == src) || !in_range(src, over_object) || user.restrained() || user.paralysis || user.sleeping || user.stat || user.lying)
 			return
 		if (!load)
 			return
+
+		if(T)
+			if(T.density)
+				boutput(user, "<span style=\"color:red\">That tile is blocked by [T].</span>")
+				return
+
+		for(var/obj/O in T.contents)
+			if(O.density)
+				boutput(user, "<span style=\"color:red\">That tile is blocked by [O].</span>")
+				return
+
 		src.visible_message("<b>[user]</b> unloads [load] from [src].")
 		unload(over_object)
 
 	proc/load(var/atom/movable/C)
-		/*if ((wires & wire_loadcheck) && !istype(C,/obj/storage/crate))
-			src.visible_message("[src] makes a sighing buzz.", "You hear an electronic buzzing sound.")
-			playsound(src.loc, "sound/machines/buzz-sigh.ogg", 50, 0)
-			return		// if not emagged, only allow crates to be loaded // cogwerks - turning this off for now to make the mule more versatile + funny
-			*/
 
 		if (istype(C, /obj/screen) || C.anchored)
 			return
@@ -74,7 +85,7 @@
 					C.layer = layer + 0.1
 				src.UpdateOverlays(C, "load")
 
-	proc/unload(var/turf/T)//var/dirn = 0)
+	proc/unload(var/turf/T)
 		if (!load)
 			return
 		if (!isturf(T))
@@ -107,14 +118,17 @@
 		if (next_cart)
 			next_cart.Move(oldloc)
 
+	disposing()
+		load = null
+		next_cart = null
+		..()
+
 /obj/vehicle/tug
 	name = "cargo tug"
 	icon = 'icons/obj/vehicles.dmi'
 	icon_state = "tractor"
-//	rider_visible = 1
 	layer = MOB_LAYER + 1
-//	sealed_cabin = 0
-	mats = 0//10
+	mats = 0
 	var/obj/tug_cart/cart = null
 	throw_dropped_items_overboard = 1
 	var/start_with_cart = 1
@@ -256,6 +270,7 @@
 		if (rider)
 			boutput(rider, "<span style=\"color:red\"><B>[src] is destroyed!</B></span>")
 			eject_rider()
+		cart = null
 		..()
 		return
 

@@ -566,10 +566,7 @@
 								src.master.explode()
 
 					src.master.display_alert(alert_beep)
-
-					if(ismob(master.loc)) //Alert the person holding us.
-						var/mob/M = master.loc
-						boutput(M, "<i><b>[bicon(master)] <a href='byond://?src=\ref[src];input=message;norefresh=1;target=[signal.data["sender"]]'>[sender]</a>:</b></i> [signal.data["message"]]")
+					src.master.display_message("<i><b>[bicon(master)] <a href='byond://?src=\ref[src];input=message;norefresh=1;target=[signal.data["sender"]]'>[sender]</a>:</b></i> [signal.data["message"]]")
 
 					src.master.updateSelfDialog()
 
@@ -702,7 +699,7 @@
 					. += " | <a href='byond://?src=\ref[src.master];eject_id_card=1'>Eject [src.master.ID_card]</a>"
 
 		pda_message(var/target_id, var/target_name, var/message, var/is_department_message)
-			if (!src.master || (!in_range(src.master, usr) && src.master.loc != usr))
+			if (!src.master || !src.master.is_user_in_range(usr))
 				return 1
 
 			if (!target_id || !target_name || !message)
