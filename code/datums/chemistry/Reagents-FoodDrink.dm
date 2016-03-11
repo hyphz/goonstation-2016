@@ -2508,5 +2508,4 @@ datum
 								sleep(2)
 								M.visible_message("<span style=\"color:red\">[M] is consumed in flames!</span>")
 								M.firegib()
->>>>>>> goon-patches
 				..(M)

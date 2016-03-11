@@ -146,5 +146,4 @@
 		src.desc = "The safety is on."
 		boutput(user, "The safety is on.")
 		safety = 1
->>>>>>> goon-patches
 	return

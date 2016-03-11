@@ -1138,5 +1138,4 @@ proc/create_fluff(var/datum/mind/target)
 	/datum/objective/regular/damage_area,
 	/datum/objective/regular/destroy_equipment,
 	/datum/objective/regular/destroy_equipment)
->>>>>>> goon-patches
 	escape_choices = list(/datum/objective/escape)
