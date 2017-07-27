@@ -1068,8 +1068,8 @@ var/list/mechanics_telepads = new/list()
 		var/inp = input(usr,"Please enter Expression:","Expression setting", expression) as text
 		if(length(inp))
 			var/regex/R = new(inp)
-			if(R.error)
-				boutput(usr, "<span style=\"color:red\">[R.error]</span>")
+			if(!R)
+				boutput(usr, "<span style=\"color:red\">Bad regex</span>")
 			else
 				inp = sanitize(html_encode(inp))
 				expression = inp
@@ -1128,8 +1128,8 @@ var/list/mechanics_telepads = new/list()
 		var/inp = input(usr,"Please enter Expression:","Expression setting", expression) as text
 		if(length(inp))
 			var/regex/R = new(inp)
-			if(R.error)
-				boutput(usr, "<span style=\"color:red\">[R.error]</span>")
+			if(!R)
+				boutput(usr, "<span style=\"color:red\">Bad regex</span>")
 			else
 				expression = inp
 				inp = sanitize(html_encode(inp))
@@ -2171,7 +2171,6 @@ var/list/mechanics_telepads = new/list()
 	New()
 		..()
 		mechanics.addInput("input", "fire")
-		verbs -= /obj/item/mechanics/verb/setvalue
 		return
 
 	proc/fire(var/datum/mechanicsMessage/input)
@@ -2392,114 +2391,6 @@ var/list/mechanics_telepads = new/list()
 
 	updateIcon()
 		icon_state = charging ? "comp_gun2x" : "comp_gun2"
-		return
-
-/obj/item/mechanics/instrumentPlayer //Grayshift's musical madness
-	name = "Instrument Player"
-	desc = ""
-	icon_state = "comp_synth"
-	density = 0
-	var/obj/item/instrument = null
-	var/pitchUnlocked = 0 // varedit this to 1 to permit really goofy pitch values!
-	var/ready = 1
-	var/delay = 10
-	var/sounds = null
-	var/volume = 50
-
-	get_desc()
-		. += "<br><span style=\"color:blue\">Current Instrument: [instrument ? "[instrument]" : "None"]</span>"
-
-	New()
-		..()
-		mechanics.addInput("play", "fire")
-		return
-
-	proc/fire(var/datum/mechanicsMessage/input)
-		if (level == 2 || !ready || !instrument) return
-		ready = 0
-		spawn(delay) ready = 1
-		var/signum = text2num(input.signal)
-		if (signum && ((signum >= 0.4 && signum <= 2) || (signum <= -0.4 && signum >= -2) || pitchUnlocked))
-			playsound(src.loc, sounds, volume, 0, 0, signum)
-		else
-			playsound(src.loc, sounds, volume, 1)
-		return
-
-	attackby(obj/item/W as obj, mob/user as mob)
-		if (..(W, user)) return // I don't know what this does but I'm copying it blindly. I guess it checks if there's a predefined action for hitting this with that?
-		if (instrument) // Already got one, chief!
-			boutput(usr, "There is already a [instrument] inside the [src].")
-			return
-		else if (istype(W, /obj/item/saxophone)) //BLUH these aren't consolidated under any combined type hello elseif chain
-			instrument = W
-			sounds = list('sound/items/sax.ogg', 'sound/items/sax2.ogg','sound/items/sax3.ogg','sound/items/sax4.ogg','sound/items/sax5.ogg')
-			volume = 50
-			delay = 100
-		else if (istype(W, /obj/item/harmonica))
-			instrument = W
-			sounds = list('sound/items/harmonica1.ogg', 'sound/items/harmonica2.ogg', 'sound/items/harmonica3.ogg')
-			volume = 50
-			delay = 20
-		else if (istype(W, /obj/item/whistle))
-			instrument = W
-			sounds = list('sound/items/whistle.ogg')
-			volume = 35
-			delay = 20
-		else if (istype(W, /obj/item/bagpipe))
-			instrument = W
-			sounds = list('sound/items/bagpipe.ogg', 'sound/items/bagpipe2.ogg','sound/items/bagpipe3.ogg')
-			volume = 50
-			delay = 100
-		else if (istype(W, /obj/item/vuvuzela))
-			instrument = W
-			sounds = 'sound/items/vuvuzela.ogg'
-			volume = 80
-			delay = 20
-		else if (istype(W, /obj/item/bikehorn))
-			instrument = W
-			sounds = 'sound/items/bikehorn.ogg'
-			volume = 50
-			delay = 5
-		else if (istype(W, /obj/item/clothing/head/butt))
-			instrument = W
-			sounds = 'sound/misc/poo2.ogg'
-			volume = 100
-			delay = 5
-		else if (istype(W, /obj/item/clothing/shoes/clown_shoes))
-			instrument = W
-			sounds = list('sound/misc/clownstep1.ogg','sound/misc/clownstep2.ogg')
-			volume = 50
-			delay = 5
-		else // IT DON'T FIT
-			user.show_text("The [W.name] isn't compatible with this component.", "red")
-
-		if (instrument) // You did it, boss. Now log it because someone will figure out a way to abuse it
-			boutput(usr, "You put the [W] inside the [src].")
-			logTheThing("station", usr, null, "adds [W] to [src] at [log_loc(src)].")
-			usr.drop_item()
-			instrument.loc = src
-		return
-
-	verb/removeInstrument()
-		set src in view(1)
-		set name = "\[Remove Instrument\]"
-		set desc = "Removes the instrument."
-		set category = "Local"
-
-		if (!istype(usr, /mob/living))
-			return
-		if (usr.stat)
-			return
-		if (!mechanics.allowChange(usr))
-			boutput(usr, "<span style=\"color:red\">[MECHFAILSTRING]</span>")
-			return
-
-		if(instrument)
-			logTheThing("station", usr, null, "removes [instrument] from [src] at [log_loc(src)].")
-			instrument.loc = get_turf(src)
-			instrument = null
-		else
-			boutput(usr, "<span style=\"color:red\">There is no instrument inside this component.</span>")
 		return
 
 /obj/mecharrow

@@ -307,8 +307,6 @@
 		src.visible_message("<span style='font-weight:bold;color:#f00;font-size:120%;'>[src] points \the [G] at [target]!</span>")
 
 	var/obj/decal/point/P = new(get_turf(target))
-	P.pixel_x = target.pixel_x
-	P.pixel_y = target.pixel_y
 	src = null // required to make sure its deleted
 	spawn (20)
 		P.invisibility = 101
@@ -514,14 +512,14 @@
 
 	// :downs:
 	if (src.get_brain_damage() >= 60)
-		message = dd_replacetext(message, " am ", " ")
-		message = dd_replacetext(message, " is ", " ")
-		message = dd_replacetext(message, " are ", " ")
-		message = dd_replacetext(message, "you", "u")
-		message = dd_replacetext(message, "help", "halp")
-		message = dd_replacetext(message, "grief", "grife")
-		message = dd_replacetext(message, "she ", "him ")
-		message = dd_replacetext(message, "he ", "him ")
+		message = replacetext(message, " am ", " ")
+		message = replacetext(message, " is ", " ")
+		message = replacetext(message, " are ", " ")
+		message = replacetext(message, "you", "u")
+		message = replacetext(message, "help", "halp")
+		message = replacetext(message, "grief", "grife")
+		message = replacetext(message, "she ", "him ")
+		message = replacetext(message, "he ", "him ")
 
 		if(prob(50))
 			message = uppertext(message)

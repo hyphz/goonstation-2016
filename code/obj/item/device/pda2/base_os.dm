@@ -285,7 +285,7 @@
 							src.message_tone = t
 
 					if("note")
-						var/inputtext = html_decode(dd_replacetext(src.note, "<br>", "\n"))
+						var/inputtext = html_decode(replacetext(src.note, "<br>", "\n"))
 
 						var/t = input(usr, "Please enter note", src.name, inputtext) as message
 						if (!t)
@@ -296,9 +296,9 @@
 
 						if(!(src.holder in src.master))
 							return
-						t = dd_replacetext(t, "\n", "|||")
+						t = replacetext(t, "\n", "|||")
 						t = copytext(adminscrub(t), 1, MAX_MESSAGE_LEN)
-						t = dd_replacetext(t, "|||", "<br>")
+						t = replacetext(t, "|||", "<br>")
 						src.note = t
 
 
@@ -566,7 +566,10 @@
 								src.master.explode()
 
 					src.master.display_alert(alert_beep)
-					src.master.display_message("<i><b>[bicon(master)] <a href='byond://?src=\ref[src];input=message;norefresh=1;target=[signal.data["sender"]]'>[sender]</a>:</b></i> [signal.data["message"]]")
+
+					if(ismob(master.loc)) //Alert the person holding us.
+						var/mob/M = master.loc
+						boutput(M, "<i><b>[bicon(master)] <a href='byond://?src=\ref[src];input=message;norefresh=1;target=[signal.data["sender"]]'>[sender]</a>:</b></i> [signal.data["message"]]")
 
 					src.master.updateSelfDialog()
 
@@ -699,7 +702,7 @@
 					. += " | <a href='byond://?src=\ref[src.master];eject_id_card=1'>Eject [src.master.ID_card]</a>"
 
 		pda_message(var/target_id, var/target_name, var/message, var/is_department_message)
-			if (!src.master || !src.master.is_user_in_range(usr))
+			if (!src.master || (!in_range(src.master, usr) && src.master.loc != usr))
 				return 1
 
 			if (!target_id || !target_name || !message)

@@ -103,11 +103,11 @@ proc/create_fluff(var/datum/mind/target)
 	if(flufftext)
 		//Add pronouns
 		var/mob/M = target.current
-		flufftext = dd_replacetext(flufftext, "$HE", he_or_she(M))
-		flufftext = dd_replacetext(flufftext, "$HIMSELF", himself_or_herself(M))
-		flufftext = dd_replacetext(flufftext, "$HIM", him_or_her(M))
-		flufftext = dd_replacetext(flufftext, "$HIS", his_or_her(M))
-		flufftext = dd_replacetext(flufftext, "$JOB", job)
+		flufftext = replacetext(flufftext, "$HE", he_or_she(M))
+		flufftext = replacetext(flufftext, "$HIMSELF", himself_or_herself(M))
+		flufftext = replacetext(flufftext, "$HIM", him_or_her(M))
+		flufftext = replacetext(flufftext, "$HIS", his_or_her(M))
+		flufftext = replacetext(flufftext, "$JOB", job)
 
 	return flufftext
 
@@ -915,10 +915,6 @@ proc/create_fluff(var/datum/mind/target)
 		var/area/shuttle = locate(/area/shuttle/escape/centcom)
 
 		for(var/mob/living/player in mobs)
-			if (istype(player, /mob/living/intangible/blob_overmind))
-				for (var/obj/blob/B in shuttle.contents)
-					return 0
-				continue
 			if (player.mind && (player.mind != owner))
 				if (player.stat != 2) //they're not dead
 					if (get_turf(player) in shuttle)
